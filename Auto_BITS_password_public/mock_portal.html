@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BITS Login Portal Mock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .login-box {
+            border: 1px solid #ccc;
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        #loginbutton {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+        <h3>Gateway to your web experience!</h3>
+        <input type="text" id="username" name="username" placeholder="Username"><br><br>
+        <input type="password" id="password" name="password" placeholder="Password"><br><br>
+        <button id="loginbutton" onclick="submitRequest()">Sign in</button>
+        <div class="error-message" id="status"></div>
+    </div>
+
+    <script>
+        const mockStorage = {
+            data: { currentIdx: 0, retryCount: 0 },
+            get: (keys) => {
+                const result = {};
+                keys.forEach(k => result[k] = mockStorage.data[k]);
+                return Promise.resolve(result);
+            },
+            set: (obj) => {
+                Object.assign(mockStorage.data, obj);
+                return Promise.resolve();
+            }
+        };
+
+        window.chrome = { storage: { local: mockStorage } };
+
+        window.BITS_CREDENTIALS = [
+            { user: "test1", pass: "pass1" },
+            { user: "test2", pass: "pass2" },
+            { user: "test3", pass: "pass3" }
+        ];
+
+        let attemptCount = 0;
+        window.submitRequest = function () {
+            console.log("MOCK: submitRequest called with user:", document.getElementById('username').value);
+            document.getElementById('status').style.display = 'none';
+            document.getElementById('status').innerText = '';
+
+            setTimeout(() => {
+                attemptCount++;
+                if (attemptCount <= 2) {
+                    console.log("MOCK: Simulating error response");
+                    document.getElementById('status').innerHTML = 'Your data transfer has been exceeded.<br>Contact CCIT at B-218.';
+                    document.getElementById('status').style.display = 'block';
+                } else {
+                    console.log("MOCK: Simulating success response");
+                    document.body.innerHTML = '<h1>Welcome, Signed in successfully!</h1>';
+                }
+            }, 500);
+        };
+    </script>
+    <script src="content.js"></script>
+    <script>
+        // Manually trigger the auto login logic since content.js has startAutoLogin() defined
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                // simulate opening the page with error already present
+                document.getElementById('status').innerHTML = 'Your data transfer has been exceeded.<br>Contact CCIT at B-218.';
+                document.getElementById('status').style.display = 'block';
+                startAutoLogin();
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

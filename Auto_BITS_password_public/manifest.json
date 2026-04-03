@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "BITS WiFi Auto-Login",
+  "version": "1.0",
+  "description": "Automatically logs into BITS WiFi/Ethernet portal.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "http://172.16.0.30/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://172.16.0.30:8090/httpclient.html"
+      ],
+      "js": [
+        "config/credentials.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "48": "icon48.png"
+  }
+}
